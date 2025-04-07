@@ -1,9 +1,17 @@
 from django import forms
 from .models import Post, Comment
 from ckeditor.widgets import CKEditorWidget
+from cloudinary.forms import CloudinaryFileField
 
 class PostForm(forms.ModelForm):
     body = forms.CharField(widget=CKEditorWidget())
+    image = CloudinaryFileField(
+        options={
+            'folder': 'post_images/',
+            'resource_type': 'auto',
+        },
+        required=False
+    )
     
     class Meta:
         model = Post
@@ -16,7 +24,6 @@ class PostForm(forms.ModelForm):
                 'data-placeholder': 'Select categories...',
                 'multiple': 'multiple'
             }),
-            'image': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
 class CommentForm(forms.ModelForm):

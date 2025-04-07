@@ -9,6 +9,8 @@ class PostForm(forms.ModelForm):
         options={
             'folder': 'post_images/',
             'resource_type': 'auto',
+            'use_filename': True,
+            'unique_filename': True,
         },
         required=False
     )

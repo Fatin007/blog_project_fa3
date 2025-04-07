@@ -45,8 +45,11 @@ def edit_post(request, id):
     if request.method == 'POST':
         post_form = forms.PostForm(request.POST, request.FILES, instance=post)
         if post_form.is_valid():
+            # Handle the image field separately
+            if 'image' in request.FILES:
+                post.image = request.FILES['image']
             post_form.instance.author = request.user
-            post_form.save(commit=True)
+            post_form.save()
             return redirect('profile')
     else:
         post_form = forms.PostForm(instance=post)

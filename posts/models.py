@@ -22,6 +22,11 @@ class Post(models.Model):
             return str(self.image)
         return None
 
+    def save(self, *args, **kwargs):
+        if self.image is None or self.image == '' or str(self.image).strip() == '':
+            self.image = None
+        super().save(*args, **kwargs)
+
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     author = models.ForeignKey(User, on_delete=models.CASCADE)

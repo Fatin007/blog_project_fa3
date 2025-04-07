@@ -8,7 +8,7 @@ from cloudinary.models import CloudinaryField
 class Post(models.Model):
     title = models.CharField(max_length=500)
     body = RichTextField()
-    category = models.ManyToField(Category)
+    category = models.ManyToManyField(Category)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     image = CloudinaryField('image', folder='post_images/', blank=True, null=True, resource_type='auto')

@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content%}
+<!-- Hero Section -->
+<div class="bg-primary text-white py-4 py-md-5 mb-4 mb-md-5">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-md-6 mb-4 mb-md-0">
+        <h1 class="display-4 fw-bold">Welcome to Our Blog</h1>
+        <p class="lead">Discover stories, thoughts, and ideas from our community of writers.</p>
+        <form class="d-flex mt-4" action="{% url 'home' %}" method="GET">
+          <input class="form-control me-2" type="search" name="search" placeholder="Search posts..." aria-label="Search">
+          <button class="btn btn-light" type="submit">Search</button>
+        </form>
+      </div>
+      <div class="col-md-6">
+        <img src="{{ hero_image }}" alt="Blog Hero" class="img-fluid rounded shadow">
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="row">
+    <!-- Categories Sidebar -->
+    <div class="col-lg-3 col-md-4 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0"><i class="fas fa-tags me-2"></i>Categories</h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="list-group list-group-flush">
+            <a href="{% url 'home' %}" class="list-group-item list-group-item-action {% if is_home %}active{% endif %}">
+              <i class="fas fa-th-large me-2"></i>All Posts
+            </a>
+            {% for cat in categories %}
+            <a href="{% url 'category_posts' cat.slug %}" 
+               class="list-group-item list-group-item-action {% if not is_home and cat.slug == request.resolver_match.kwargs.slug %}active{% endif %}">
+              <i class="fas fa-folder me-2"></i>{{cat.name}}
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Posts Section -->
+    <div class="col-lg-9 col-md-8">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+        {% if is_home %}
+        <h2 class="mb-2 mb-md-0"><i class="fas fa-newspaper me-2"></i>Recent Posts</h2>
+        {% else %}
+          {% if posts|length == 0 %}
+          <h2 class="mb-2 mb-md-0"><i class="fas fa-search me-2"></i>No posts found</h2>
+          {% elif posts|length == 1 %}
+          <h2 class="mb-2 mb-md-0"><i class="fas fa-search me-2"></i>1 result found</h2>
+          {% else %}
+          <h2 class="mb-2 mb-md-0"><i class="fas fa-search me-2"></i>{{ posts|length }} results found</h2>
+          {% endif %}
+        {% endif %}
+        
+        <div class="btn-group">
+          <button type="button" class="btn btn-outline-primary active"><i class="fas fa-th-large"></i></button>
+          <button type="button" class="btn btn-outline-primary"><i class="fas fa-list"></i></button>
+        </div>
+      </div>
+
+      <div class="row row-cols-1 row-cols-md-2 g-4">
+        {% for post in posts %}
+        <div class="col">
+          <div class="card h-100 post-card">
+            {% if post.image %}
+            <div class="post-image-container">
+              <img src="{{ post.image.url }}" class="card-img-top" alt="{{ post.title }}">
+            </div>
+            {% endif %}
+            <div class="card-body d-flex flex-column">
+              <div class="post-categories mb-2">
+                {% for cat in post.category.all %}
+                <span class="badge bg-dark text-white me-1 mb-1">{{cat.name}}</span>
+                {% endfor %}
+              </div>
+              <h5 class="card-title">
+                <a class="text-decoration-none text-dark fw-bold" href="{% url 'view_post' post.id %}">
+                  {{post.title}}
+                </a>
+              </h5>
+              <p class="card-text text-muted flex-grow-1">
+                {{post.body|safe|truncatewords:30}}
+              </p>
+              <div class="post-meta d-flex justify-content-between align-items-center mt-3">
+                <div class="d-flex align-items-center">
+                  {% if post.author.profile.profile_picture %}
+                    <img src="{{ post.author.profile.profile_picture.url }}" alt="{{ post.author.get_full_name }}" class="rounded-circle me-2" style="width: 24px; height: 24px; object-fit: cover;">
+                  {% else %}
+                    <i class="fa-solid fa-user me-2 text-primary"></i>
+                  {% endif %}
+                  <span class="text-muted">{{post.author.first_name}} {{post.author.last_name}}</span>
+                </div>
+                <small class="text-muted">
+                  <i class="far fa-clock me-1"></i> {{post.created_at|date:"M d, Y"}}
+                </small>
+              </div>
+              <div class="mt-3">
+                <a href="{% url 'view_post' post.id %}" class="btn btn-outline-primary btn-sm w-100">Read More</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Pagination -->
+      {% if posts.has_other_pages %}
+      <nav class="mt-4">
+        <ul class="pagination justify-content-center flex-wrap">
+          {% if posts.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ posts.previous_page_number }}"><i class="fas fa-chevron-left"></i> Previous</a>
+          </li>
+          {% endif %}
+
+          {% for num in posts.paginator.page_range %}
+          <li class="page-item {% if posts.number == num %}active{% endif %}">
+            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+          </li>
+          {% endfor %}
+
+          {% if posts.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ posts.next_page_number }}">Next <i class="fas fa-chevron-right"></i></a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+  .post-card {
+    border: none;
+    border-radius: 10px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  }
+  
+  .post-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+  }
+  
+  .post-image-container {
+    height: 200px;
+    overflow: hidden;
+  }
+  
+  .post-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  
+  .post-card:hover .post-image-container img {
+    transform: scale(1.05);
+  }
+  
+  .post-categories .badge {
+    font-weight: 500;
+    padding: 5px 10px;
+    border-radius: 20px;
+  }
+  
+  .post-meta {
+    font-size: 0.9rem;
+  }
+  
+  @media (max-width: 767.98px) {
+    .post-image-container {
+      height: 180px;
+    }
+  }
+</style>
+{% endblock content %}

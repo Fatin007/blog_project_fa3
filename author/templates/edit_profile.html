@@ -1,0 +1,170 @@
+{% extends "base.html" %}
+{% block title %}Edit Profile | {{user}}{% endblock %}
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center my-4">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white py-3">
+                    <h4 class="mb-0"><i class="fas fa-user-edit me-2"></i>Edit Profile</h4>
+                </div>
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <div class="profile-picture-preview mb-3">
+                            {% if user.profile.profile_picture %}
+                                <img src="{{ user.profile.profile_picture.url }}" alt="Current Profile Picture" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
+                            {% else %}
+                                <div class="default-profile-picture">
+                                    <i class="fas fa-user-circle fa-5x text-primary"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <a href="{% url "change_password" %}" class="btn btn-outline-warning">
+                            <i class="fas fa-key me-1"></i> Change Password
+                        </a>
+                    </div>
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-user me-2"></i>User Information</h5>
+                            </div>
+                            <div class="card-body">
+                                {% for field in user_form %}
+                                <div class="mb-3">
+                                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                    {{ field }}
+                                    {% if field.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ field.errors }}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="mb-0"><i class="fas fa-id-card me-2"></i>Profile Information</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label for="{{ profile_form.profile_picture.id_for_label }}" class="form-label">Profile Picture</label>
+                                    <div class="input-group">
+                                        {{ profile_form.profile_picture }}
+                                    </div>
+                                    {% if profile_form.profile_picture.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ profile_form.profile_picture.errors }}
+                                    </div>
+                                    {% endif %}
+                                    <div class="form-text">Recommended size: 200x200 pixels. Maximum file size: 2MB.</div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label for="{{ profile_form.bio.id_for_label }}" class="form-label">Bio</label>
+                                    {{ profile_form.bio }}
+                                    {% if profile_form.bio.errors %}
+                                    <div class="invalid-feedback d-block">
+                                        {{ profile_form.bio.errors }}
+                                    </div>
+                                    {% endif %}
+                                    <div class="form-text">Tell us about yourself (maximum 500 characters).</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-save me-2"></i>Save Changes
+                            </button>
+                            <a href="{% url 'profile' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .profile-picture-preview {
+        width: 120px;
+        height: 120px;
+        margin: 0 auto;
+        border-radius: 50%;
+        overflow: hidden;
+        background-color: #f8f9fa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .default-profile-picture {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f9fa;
+    }
+    
+    .form-control {
+        border-radius: 0.5rem;
+        padding: 0.75rem 1rem;
+        border: 1px solid #dee2e6;
+    }
+    
+    .form-control:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+    
+    textarea.form-control {
+        min-height: 120px;
+    }
+    
+    .card {
+        border: none;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    }
+    
+    .card-header {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+    }
+    
+    .btn {
+        padding: 0.75rem 1.5rem;
+        font-weight: 500;
+    }
+    
+    .btn-lg {
+        padding: 1rem 1.5rem;
+    }
+    
+    .form-text {
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    .invalid-feedback {
+        font-size: 0.875rem;
+    }
+    
+    @media (max-width: 767.98px) {
+        .card-body {
+            padding: 1rem;
+        }
+        
+        .btn {
+            padding: 0.5rem 1rem;
+        }
+    }
+</style>
+{% endblock content %}

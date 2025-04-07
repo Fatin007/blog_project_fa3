@@ -48,6 +48,8 @@ def edit_post(request, id):
             # Handle the image field separately
             if 'image' in request.FILES:
                 post.image = request.FILES['image']
+            elif 'image' in request.POST and request.POST['image'] == '':
+                post.image = None
             post_form.instance.author = request.user
             post_form.save()
             return redirect('profile')

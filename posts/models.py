@@ -8,10 +8,10 @@ from cloudinary.models import CloudinaryField
 class Post(models.Model):
     title = models.CharField(max_length=500)
     body = RichTextField()
-    category = models.ManyToManyField(Category)
+    category = models.ManyToField(Category)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    image = CloudinaryField('image', folder='post_images/', blank=True, null=True)
+    image = CloudinaryField('image', folder='post_images/', blank=True, null=True, resource_type='auto')
 
     def __str__(self):
         return self.title
@@ -19,7 +19,7 @@ class Post(models.Model):
     @property
     def image_url(self):
         if self.image:
-            return self.image.url
+            return str(self.image)
         return None
 
 class Comment(models.Model):

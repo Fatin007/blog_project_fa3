@@ -11,6 +11,7 @@ class PostForm(forms.ModelForm):
             'resource_type': 'auto',
             'use_filename': True,
             'unique_filename': True,
+            'overwrite': True,
         },
         required=False
     )
@@ -27,6 +28,12 @@ class PostForm(forms.ModelForm):
                 'multiple': 'multiple'
             }),
         }
+
+    def clean_image(self):
+        image = self.cleaned_data.get('image')
+        if image and not isinstance(image, str):
+            return image
+        return None
 
 class CommentForm(forms.ModelForm):
     class Meta:

@@ -29,7 +29,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-8=l2$w^s57g2k#h-0*4n1*f#c=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
-ALLOWED_HOSTS = ['*']  # Configure this appropriately in production
+# Configure this with your actual domain in production
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', 'localhost,127.0.0.1,.onrender.com').split(',')
 
 
 # Application definition

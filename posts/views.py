@@ -45,18 +45,8 @@ def edit_post(request, id):
     if request.method == 'POST':
         post_form = forms.PostForm(request.POST, request.FILES, instance=post)
         if post_form.is_valid():
-            # Handle image removal - check for remove_image checkbox
-            if 'remove_image' in request.POST and request.POST['remove_image'] == 'on':
-                post.image = None
-            elif 'image' in request.FILES:
-                post.image = request.FILES['image']
-            elif 'image' in request.POST and (request.POST['image'] == '' or request.POST['image'] is None):
-                # Only clear if remove_image is not checked (to avoid double-clearing)
-                if 'remove_image' not in request.POST or request.POST['remove_image'] != 'on':
-                    post.image = None
-            
             post_form.instance.author = request.user
-            post_form.save()
+            post_form.save(commit=True)
             return redirect('profile')
     else:
         post_form = forms.PostForm(instance=post)
@@ -71,16 +61,6 @@ class EditPostView(UpdateView):
     pk_url_kwarg = 'id'
     
     def form_valid(self, form):
-        # Handle image removal - check for remove_image checkbox
-        if 'remove_image' in self.request.POST and self.request.POST['remove_image'] == 'on':
-            form.instance.image = None
-        elif 'image' in self.request.FILES:
-            form.instance.image = self.request.FILES['image']
-        elif 'image' in self.request.POST and (self.request.POST['image'] == '' or self.request.POST['image'] is None):
-            # Only clear if remove_image is not checked (to avoid double-clearing)
-            if 'remove_image' not in self.request.POST or self.request.POST['remove_image'] != 'on':
-                form.instance.image = None
-                
         form.instance.author = self.request.user
         return super().form_valid(form)
     

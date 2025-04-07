@@ -11,7 +11,7 @@ class Post(models.Model):
     category = models.ManyToManyField(Category)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
-    image = CloudinaryField('image', folder='post_images/', blank=True, null=True, resource_type='auto')
+    image = CloudinaryField('image', folder='post_images/', blank=True, null=True)
 
     def __str__(self):
         return self.title
@@ -19,13 +19,8 @@ class Post(models.Model):
     @property
     def image_url(self):
         if self.image:
-            return str(self.image)
+            return self.image.url
         return None
-
-    def save(self, *args, **kwargs):
-        if self.image is None or self.image == '' or str(self.image).strip() == '':
-            self.image = None
-        super().save(*args, **kwargs)
 
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)

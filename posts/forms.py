@@ -9,9 +9,6 @@ class PostForm(forms.ModelForm):
         options={
             'folder': 'post_images/',
             'resource_type': 'auto',
-            'use_filename': True,
-            'unique_filename': True,
-            'overwrite': True,
         },
         required=False
     )
@@ -28,17 +25,6 @@ class PostForm(forms.ModelForm):
                 'multiple': 'multiple'
             }),
         }
-
-    def clean_image(self):
-        image = self.cleaned_data.get('image')
-        # Handle empty or None values
-        if image == '' or image is None or (isinstance(image, str) and image.strip() == ''):
-            return None
-        # Return the image if it's a file object
-        if not isinstance(image, str):
-            return image
-        # If it's a string (URL), return None to clear the image
-        return None
 
 class CommentForm(forms.ModelForm):
     class Meta:

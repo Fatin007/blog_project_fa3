@@ -1,7 +1,7 @@
 from django.db import models
 from categories.models import Category
 from django.contrib.auth.models import User
-from ckeditor.fields import RichTextField
+from ckeditor.fields import RichTextField 
 
 # Create your models here.
 class Post(models.Model):

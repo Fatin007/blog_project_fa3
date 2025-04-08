@@ -7,6 +7,8 @@ from django.contrib.auth.decorators import login_required
 from posts.models import Post
 from django.contrib.auth.views import LoginView, LogoutView
 from django.urls import reverse_lazy
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import user_passes_test
 # Create your views here.
 def register(request):
     if request.user.is_authenticated:
@@ -106,3 +108,17 @@ def change_password(request):
     else:
         form = PasswordChangeForm(request.user)
     return render(request, 'change_password.html', {'form': form, 'type': 'Change Password'})
+
+@login_required(login_url='login')
+@user_passes_test(lambda u: u.is_superuser)
+def manage_users(request):
+    users = User.objects.all()
+    return render(request, 'manage_users.html', {'users': users})
+
+@login_required(login_url='login')
+@user_passes_test(lambda u: u.is_superuser)
+def delete_user(request, pk):
+    user = User.objects.get(pk=pk)
+    user.delete()
+    return redirect('manage_users')
+

@@ -56,7 +56,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
           <a class="navbar-brand" href="{% url 'home' %}">
-            <i class="fas fa-blog me-2"></i>FN-Blogs
+            <i class="fas fa-blog me-2"></i>Fa<span class="text-danger">3</span>-Blog
           </a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent" aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
@@ -72,6 +72,13 @@
               <li class="nav-item">
                 <a class="nav-link {% if request.resolver_match.url_name == 'add_post' %}active{% endif %}" href="{% url 'add_post' %}">
                   <i class="fas fa-plus me-2"></i>Add Post
+                </a>
+              </li>
+              {% endif %}
+              {% if user.is_superuser %}
+              <li class="nav-item">
+                <a class="nav-link {% if request.resolver_match.url_name == 'add_category' %}active{% endif %}" href="{% url 'add_category' %}">
+                  <i class="fas fa-plus me-2"></i>Add Category
                 </a>
               </li>
               {% endif %}

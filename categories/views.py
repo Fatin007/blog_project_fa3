@@ -1,7 +1,11 @@
 from django.shortcuts import render, redirect
 from . import forms
+from django.contrib.auth.decorators import login_required, user_passes_test
 
 # Create your views here.
+
+@login_required(login_url='login')
+@user_passes_test(lambda u: u.is_superuser)
 def add_category(request):
     if request.method == 'POST':
         category_form = forms.CategoryForm(request.POST)

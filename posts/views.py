@@ -16,7 +16,7 @@ def add_post(request):
         if post_form.is_valid():
             post_form.instance.author = request.user
             post_form.save(commit=True)
-            return redirect('add_post')
+            return redirect('view_post', id=post_form.instance.id)
     else:
         post_form = forms.PostForm()
     return render(request, 'add_post.html', {'form': post_form, 'type': 'Add Post'})
@@ -26,7 +26,7 @@ class AddPostView(CreateView):
     model = Post
     form_class = forms.PostForm
     template_name = 'add_post.html'
-    success_url = reverse_lazy('add_post')
+    success_url = reverse_lazy('view_post', kwargs={'id': 'id'})
     
     def form_valid(self, form):
         form.instance.author = self.request.user
@@ -57,7 +57,7 @@ class EditPostView(UpdateView):
     model = Post
     form_class = forms.PostForm
     template_name = 'add_post.html'
-    success_url = reverse_lazy('home')
+    success_url = reverse_lazy('view_post', kwargs={'id': 'id'})
     pk_url_kwarg = 'id'
     
     def form_valid(self, form):
@@ -102,7 +102,6 @@ class PostDetailView(DetailView):
             comment.save()
             return redirect('view_post', id=post.id)
         else:
-            # If form is invalid, render the template with the form errors
             context = self.get_context_data(**kwargs)
             context['comment_form'] = comment_form
             return self.render_to_response(context)

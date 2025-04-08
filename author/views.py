@@ -66,7 +66,7 @@ class LoginClassView(LoginView):
 
 @login_required(login_url='login')
 def profile(request):
-    data=Post.objects.filter(author=request.user)
+    data=Post.objects.filter(author=request.user).order_by('-created_at')
     return render(request, 'profile.html', {'data': data})
 
 @login_required(login_url='login')

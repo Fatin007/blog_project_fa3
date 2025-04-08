@@ -96,8 +96,11 @@ os.makedirs(MEDIA_ROOT, exist_ok=True)
 # Configure WhiteNoise for serving media files in production
 if not DEBUG:
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-    # Add media files to WhiteNoise
+    # Configure WhiteNoise to serve media files
     WHITENOISE_ROOT = os.path.join(BASE_DIR, 'media')
+    # Add media files to WhiteNoise's allowed paths
+    WHITENOISE_ALLOW_ALL_ORIGINS = True
+    WHITENOISE_INDEX_FILE = True
 
 WSGI_APPLICATION = 'blog_project.wsgi.application'
 

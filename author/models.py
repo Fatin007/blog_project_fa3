@@ -26,16 +26,13 @@ class UserProfile(models.Model):
             return self.profile_picture.url
         return None
 
-# Signal to create a UserProfile when a new User is created
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         UserProfile.objects.create(user=instance)
     else:
-        # Get or create the profile if it doesn't exist
         UserProfile.objects.get_or_create(user=instance)
 
-# Signal to save the UserProfile when the User is saved
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
     try:

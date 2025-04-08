@@ -3,13 +3,13 @@
 set -o errexit
 
 # Install Python dependencies
-pip install -r requirements-prod.txt
+pip install -r requirements.txt
+
+# Create media directory if it doesn't exist
+mkdir -p media
 
 # Collect static files
 python manage.py collectstatic --no-input
-
-# Create migrations
-python manage.py makemigrations
 
 # Run migrations
 python manage.py migrate 

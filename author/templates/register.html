@@ -8,4 +8,11 @@
         {{ form|crispy }}
         <button type="submit" class="btn btn-primary my-3">{{type}}</button>
     </form>
+    <div class="w-50 mx-auto">
+        {% if type == "Register" %}
+            <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
+        {% else %}
+            <p>Don't have an account? <a href="{% url 'register' %}">Register</a></p>
+        {% endif %}
+    </div>
 {% endblock content %}

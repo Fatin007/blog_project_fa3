@@ -7,14 +7,16 @@ import requests
 
 # Create your views here.
 def get_random_hero_image():
-    """Fetch a random programming/technology image from Unsplash API"""
+    categories = Category.objects.all()
+    category_names = [cat.name for cat in categories]
+    query = ",".join(category_names)
     try:
         response = requests.get(
             "https://api.unsplash.com/photos/random",
             params={
-                "query": "programming,technology,nature",
+                "query": query,
                 "orientation": "landscape",
-                "size": "1080x1920",
+                "size": "regular",
                 "client_id": "zm-9boI1TX8SSwK--qzFM4G1lDha48nbvCYP67g9VDA"
             }
         )

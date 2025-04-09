@@ -10,6 +10,7 @@ class Post(models.Model):
     category = models.ManyToManyField(Category)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
+    view_count = models.IntegerField(default=0, blank=True, null=True, editable=False)
     image = models.ImageField(upload_to='post_images/', blank=True, null=True)
 
     def __str__(self):

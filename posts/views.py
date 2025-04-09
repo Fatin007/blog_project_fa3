@@ -79,6 +79,8 @@ def delete_post(request, id):
 
 def view_post(request, id):
     post = Post.objects.get(id=id)
+    post.view_count += 1
+    post.save()
     return render(request, 'view_post.html', {'post': post})
 
 class PostDetailView(DetailView):

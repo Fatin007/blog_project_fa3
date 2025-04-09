@@ -8,7 +8,7 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         # fields = '__all__'
-        exclude = ['author']
+        exclude = ['author', 'view_count']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter post title'}),
             'category': forms.SelectMultiple(attrs={

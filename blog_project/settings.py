@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
-import dj_database_url
+import dj_database_url  # Commented for local development
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-8=l2$w^s57g2k#h-0*4n1*f#c=_4t2(pjtm6x4_^8!a0tx@u^y')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+DEBUG = False  # Set to True for local development
 
 ALLOWED_HOSTS = ['*']  # Configure this appropriately in production
 
@@ -57,7 +57,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Add whitenoise middleware
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Commented for local development
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -94,7 +94,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 os.makedirs(MEDIA_ROOT, exist_ok=True)
 
 # Configure WhiteNoise for serving media files in production
-if not DEBUG:
+if not DEBUG:  # Commented for local development
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
     # Configure WhiteNoise to serve media files
     WHITENOISE_ROOT = os.path.join(BASE_DIR, 'media')
@@ -108,6 +108,14 @@ WSGI_APPLICATION = 'blog_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
+}
+
+# Production database configuration (commented for local development)
 DATABASES = {
     'default': dj_database_url.config(
         default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
@@ -158,7 +166,7 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Enable WhiteNoise compression and caching
+# Enable WhiteNoise compression and caching (commented for local development)
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # CKEditor Upload Path
@@ -182,6 +190,7 @@ CKEDITOR_CONFIGS = {
             ['NumberedList','BulletedList'],
             ['Indent','Outdent'],
             ['Maximize'],
+            ['Code'],
         ],
         'toolbar': 'Full',
         'height': 300,
@@ -213,7 +222,7 @@ CKEDITOR_CONFIGS = {
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Security Settings
+# Security Settings (commented for local development)
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True

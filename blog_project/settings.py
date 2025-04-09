@@ -30,7 +30,8 @@ SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-8=l2$w^s57g2k#h-0*4n1*f#c=
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False  # Set to True for local development
 
-ALLOWED_HOSTS = ['*']  # Configure this appropriately in production
+# ALLOWED_HOSTS = ['*']  # Configure this appropriately in production
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'fa3-blog.onrender.com/', 'www.fa3-blog.onrender.com/', 'https://fa3-blog.onrender.com/', 'https://www.fa3-blog.onrender.com/', '13.228.225.19', '18.142.128.26', '54.254.162.138' ]
 
 
 # Application definition

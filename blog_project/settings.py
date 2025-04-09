@@ -190,7 +190,6 @@ CKEDITOR_CONFIGS = {
             ['NumberedList','BulletedList'],
             ['Indent','Outdent'],
             ['Maximize'],
-            ['Code'],
         ],
         'toolbar': 'Full',
         'height': 300,

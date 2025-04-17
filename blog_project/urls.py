@@ -14,7 +14,10 @@ urlpatterns = [
     path('', include('home.urls')),
 ]
 
-# Serve media files in both development and production
-urlpatterns += [
-    path('media/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
-]
+# Serve media files only in development
+# In production, Cloudinary will handle media files
+if settings.DEBUG:
+    urlpatterns += [
+        path('media/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
+    ]
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

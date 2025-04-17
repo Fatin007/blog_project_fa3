@@ -162,7 +162,11 @@ os.makedirs(MEDIA_ROOT, exist_ok=True)
 # Configure WhiteNoise for static files in production, but not for media files
 if not DEBUG:
     STATICFILES_STORAGE = env_config['static_storage']
-    # Don't use WhiteNoise for media files, use Cloudinary instead
+    # Explicitly set media files to use Cloudinary in production
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+else:
+    # In development, use default file storage
+    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 WSGI_APPLICATION = 'blog_project.wsgi.application'
 

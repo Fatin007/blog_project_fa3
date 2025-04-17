@@ -12,9 +12,12 @@ urlpatterns = [
     path('category/', include('categories.urls')),
     path('category/<slug:slug>/', views.home, name='category_posts'),
     path('', include('home.urls')),
+    path('ckeditor/', include('ckeditor_uploader.urls')),  # Add CKEditor upload URLs
 ]
 
-# Serve media files in both development and production
-urlpatterns += [
-    path('media/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
-]
+# Only serve media files locally in development
+# In production, Cloudinary will handle media URLs
+if settings.DEBUG:
+    urlpatterns += [
+        path('media/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
+    ]

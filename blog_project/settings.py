@@ -140,23 +140,12 @@ TEMPLATES = [
     },
 ]
 
-# Base url to serve media files
-MEDIA_URL = '/media/'
-
-# Path where media is stored (for local development fallback)
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-# Ensure the media directory exists
-os.makedirs(MEDIA_ROOT, exist_ok=True)
-
-# Configure WhiteNoise for static files in production, but not for media files
+# Configure storage for media files
 if not DEBUG:
-    STATICFILES_STORAGE = env_config['static_storage']
-    
-    # Force media files to use Cloudinary in production
+    # Force Cloudinary for ALL media in production
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
     
-    # Set CloudinaryMediaStorage as the default file storage for all media
+    # Configure Cloudinary
     CLOUDINARY_STORAGE = {
         'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'duoovd5y9'),
         'API_KEY': os.getenv('CLOUDINARY_API_KEY', '228944556196295'),
@@ -166,15 +155,24 @@ if not DEBUG:
         'STATIC_IMAGES_EXTENSIONS': ['jpg', 'jpe', 'jpeg', 'jpc', 'jp2', 'j2k', 'wdp', 'jxr', 
                                     'hdp', 'png', 'gif', 'webp', 'bmp', 'tif', 'tiff', 'ico'],
     }
-    # Override the URL format to ensure it's using HTTPS
-    MEDIA_URL = 'https://res.cloudinary.com/' + CLOUDINARY_STORAGE['CLOUD_NAME'] + '/image/upload/'
+    
+    # Direct Cloudinary URL in production
+    MEDIA_URL = f'https://res.cloudinary.com/{CLOUDINARY_STORAGE["CLOUD_NAME"]}/image/upload/'
+    
+    # Force WhiteNoise for static files in production
+    STATICFILES_STORAGE = env_config['static_storage']
+    
+    # Disable local media storage in production
+    MEDIA_ROOT = None
 else:
     # In development, use default file storage
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
     MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+    # Ensure the media directory exists in development
+    os.makedirs(MEDIA_ROOT, exist_ok=True)
 
 WSGI_APPLICATION = 'blog_project.wsgi.application'
-
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -236,7 +234,6 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
 
 
 # Internationalization

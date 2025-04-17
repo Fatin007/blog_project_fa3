@@ -48,7 +48,7 @@ def configure_environment(environment):
     if environment.lower() == 'production':
         config.update({
             'debug': False,
-            'static_storage': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+            'static_storage': 'cloudinary_storage.storage.StaticCloudinaryStorage',
             'secure_ssl_redirect': True,
             'session_cookie_secure': True,
             'csrf_cookie_secure': True,

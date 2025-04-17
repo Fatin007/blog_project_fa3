@@ -21,6 +21,61 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
+# Function to configure environment (development or production)
+def configure_environment(environment):
+    """
+    Configure Django settings based on the environment.
+    
+    Args:
+        environment (str): Either 'development' or 'production'
+    
+    Returns:
+        dict: Dictionary with environment-specific settings
+    """
+    config = {
+        'debug': True,
+        'whitenoise_enabled': False,
+        'static_storage': 'django.contrib.staticfiles.storage.StaticFilesStorage',
+        'secure_ssl_redirect': False,
+        'session_cookie_secure': False,
+        'csrf_cookie_secure': False,
+        'secure_browser_xss_filter': False,
+        'secure_content_type_nosniff': False,
+        'x_frame_options': 'SAMEORIGIN',
+    }
+    
+    if environment.lower() == 'production':
+        config.update({
+            'debug': False,
+            'whitenoise_enabled': True,
+            'static_storage': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+            'secure_ssl_redirect': True,
+            'session_cookie_secure': True,
+            'csrf_cookie_secure': True,
+            'secure_browser_xss_filter': True,
+            'secure_content_type_nosniff': True,
+            'x_frame_options': 'DENY',
+            'database': dj_database_url.config(
+                default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
+                conn_max_age=600
+            )
+        })
+    else:  # development
+        config.update({
+            'database': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        })
+    
+    return config
+
+
+# Set environment (change this to 'production' when deploying)
+ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'development')
+# ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'production')
+env_config = configure_environment(ENVIRONMENT)
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -28,7 +83,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-8=l2$w^s57g2k#h-0*4n1*f#c=_4t2(pjtm6x4_^8!a0tx@u^y')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False  # Set to True for local development
+DEBUG = env_config['debug']
 
 # ALLOWED_HOSTS = ['*']  # Configure this appropriately in production
 ALLOWED_HOSTS = [
@@ -65,7 +120,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Commented for local development
+    'whitenoise.middleware.WhiteNoiseMiddleware' if env_config['whitenoise_enabled'] else '',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -73,6 +128,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# Remove empty middleware values
+MIDDLEWARE = [m for m in MIDDLEWARE if m]
 
 ROOT_URLCONF = 'blog_project.urls'
 
@@ -102,8 +160,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 os.makedirs(MEDIA_ROOT, exist_ok=True)
 
 # Configure WhiteNoise for serving media files in production
-if not DEBUG:  # Commented for local development
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+if not DEBUG:
+    STATICFILES_STORAGE = env_config['static_storage']
     # Configure WhiteNoise to serve media files
     WHITENOISE_ROOT = os.path.join(BASE_DIR, 'media')
     # Add media files to WhiteNoise's allowed paths
@@ -117,20 +175,8 @@ WSGI_APPLICATION = 'blog_project.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    'default': env_config['database']
 }
-
-# Production database configuration (commented for local development)
-DATABASES = {
-    'default': dj_database_url.config(
-        default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
-        conn_max_age=600
-    )
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -173,9 +219,6 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# Enable WhiteNoise compression and caching (commented for local development)
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # CKEditor Upload Path
 CKEDITOR_UPLOAD_PATH = 'uploads/'
@@ -229,10 +272,10 @@ CKEDITOR_CONFIGS = {
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Security Settings (commented for local development)
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
-SECURE_BROWSER_XSS_FILTER = True
-SECURE_CONTENT_TYPE_NOSNIFF = True
-X_FRAME_OPTIONS = 'DENY'
+# Security Settings
+SECURE_SSL_REDIRECT = env_config['secure_ssl_redirect']
+SESSION_COOKIE_SECURE = env_config['session_cookie_secure']
+CSRF_COOKIE_SECURE = env_config['csrf_cookie_secure']
+SECURE_BROWSER_XSS_FILTER = env_config['secure_browser_xss_filter']
+SECURE_CONTENT_TYPE_NOSNIFF = env_config['secure_content_type_nosniff']
+X_FRAME_OPTIONS = env_config['x_frame_options']

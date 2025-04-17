@@ -79,9 +79,38 @@ def delete_post(request, id):
 
 def view_post(request, id):
     post = Post.objects.get(id=id)
+    
+    if request.method == 'POST' and request.user.is_authenticated:
+        # print("POST request received")
+        comment_form = forms.CommentForm(request.POST)
+        if comment_form.is_valid():
+            # print("Form is valid")
+            comment = comment_form.save(commit=False)
+            comment.post = post
+            comment.author = request.user
+            
+            # Handle parent comment for replies
+            parent_id = comment_form.cleaned_data.get('parent')
+            if parent_id:
+                comment.parent = parent_id
+                # print(f"Parent comment ID: {parent_id}")
+            
+            comment.save()
+            # print(f"Comment saved with ID: {comment.id}")
+            return redirect('view_post', id=post.id)
+        # else:
+            # print(f"Form errors: {comment_form.errors}")
+    else:
+        comment_form = forms.CommentForm()
+    
+    # Increment view count
     post.view_count += 1
     post.save()
-    return render(request, 'view_post.html', {'post': post})
+    
+    return render(request, 'view_post.html', {
+        'post': post,
+        'comment_form': comment_form
+    })
 
 class PostDetailView(DetailView):
     model = Post
@@ -94,17 +123,31 @@ class PostDetailView(DetailView):
         context['comment_form'] = forms.CommentForm()
         return context
     
+    def get_object(self, queryset=None):
+        post = super().get_object(queryset)
+        post.view_count += 1
+        post.save()
+        return post
+    
     def post(self, request, *args, **kwargs):
         post = self.get_object()
+        
+        if not request.user.is_authenticated:
+            return redirect('login')
+        
         comment_form = forms.CommentForm(request.POST)
         if comment_form.is_valid():
             comment = comment_form.save(commit=False)
             comment.post = post
             comment.author = request.user
+            
+            parent_id = comment_form.cleaned_data.get('parent')
+            if parent_id:
+                comment.parent = parent_id
+            
             comment.save()
             return redirect('view_post', id=post.id)
         else:
             context = self.get_context_data(**kwargs)
             context['comment_form'] = comment_form
             return self.render_to_response(context)
-

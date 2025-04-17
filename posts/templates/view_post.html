@@ -65,7 +65,7 @@
                                 {% endif %}
                                 <div class="form-text text-muted">Comments cannot be empty or contain only spaces.</div>
                             </div>
-                            <input type="hidden" name="parent" id="id_parent" value="">
+                            {{ comment_form.parent }}
                             <button type="submit" class="btn btn-primary">Submit Comment</button>
                         </form>
                     </div>
@@ -106,7 +106,7 @@
                             </div>
                             {% endif %}
                             
-                            <!-- Reply form (hidden by default) -->
+                            <!-- Reply form -->
                             <div class="reply-form mt-3" id="reply-form-{{ comment.id }}" style="display: none;">
                                 <form method="post" class="reply-comment-form">
                                     {% csrf_token %}
@@ -145,6 +145,8 @@
                                 </div>
                                 {% endfor %}
                             </div>
+
+
                         </div>
                     </div>
                     {% endif %}
@@ -215,7 +217,6 @@
                 });
             });
             
-            // Hide reply form when cancel button is clicked
             const cancelButtons = document.querySelectorAll('.cancel-reply');
             cancelButtons.forEach(button => {
                 button.addEventListener('click', function() {

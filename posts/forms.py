@@ -20,13 +20,27 @@ class PostForm(forms.ModelForm):
         }
 
 class CommentForm(forms.ModelForm):
+    parent = forms.IntegerField(widget=forms.HiddenInput(), required=False)
+    
     class Meta:
         model = Comment
-        fields = ['body']
+        fields = ['body', 'parent']
+        widgets = {
+            'body': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Write your comment here...'}),
+        }
         
     def clean_body(self):
         body = self.cleaned_data.get('body')
         if body and body.strip() == '':
             raise forms.ValidationError("Comment cannot be empty or contain only spaces.")
         return body
+        
+    def clean_parent(self):
+        parent = self.cleaned_data.get('parent')
+        if parent:
+            try:
+                return Comment.objects.get(id=parent)
+            except Comment.DoesNotExist:
+                return None
+        return None
 

@@ -71,9 +71,8 @@ def configure_environment(environment):
     return config
 
 
-# Set environment (change this to 'production' when deploying)
-ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'development')
-# ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'production')
+# ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'development')
+ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'production')
 env_config = configure_environment(ENVIRONMENT)
 
 # Quick-start development settings - unsuitable for production

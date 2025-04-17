@@ -48,7 +48,6 @@ def configure_environment(environment):
     if environment.lower() == 'production':
         config.update({
             'debug': False,
-            'whitenoise_enabled': True,
             'static_storage': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
             'secure_ssl_redirect': True,
             'session_cookie_secure': True,
@@ -56,18 +55,7 @@ def configure_environment(environment):
             'secure_browser_xss_filter': True,
             'secure_content_type_nosniff': True,
             'x_frame_options': 'DENY',
-            # 'database': dj_database_url.config(
-            #     default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
-            #     conn_max_age=600
-            # )
         })
-    # else:  # development
-    #     config.update({
-    #         'database': {
-    #             'ENGINE': 'django.db.backends.sqlite3',
-    #             'NAME': BASE_DIR / 'db.sqlite3',
-    #         }
-    #     })
     
     return config
 

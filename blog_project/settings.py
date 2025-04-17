@@ -80,6 +80,9 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'fa3-blog.onrender.com',
     'www.fa3-blog.onrender.com',
+    '13.228.225.19',
+    '18.142.128.26',
+    '54.254.162.138'
 ]
 
 # Application definition
@@ -90,9 +93,6 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    # Cloudinary apps must come before django.contrib.staticfiles
-    'cloudinary',
-    'cloudinary_storage',
     'django.contrib.staticfiles',
     "crispy_forms",
     "crispy_bootstrap5",
@@ -101,7 +101,6 @@ INSTALLED_APPS = [
     'categories',
     'home',
     'ckeditor',
-    'ckeditor_uploader',  # Add CKEditor uploader app
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -110,7 +109,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    # 'whitenoise.middleware.WhiteNoiseMiddleware' if env_config['whitenoise_enabled'] else '',
+    'whitenoise.middleware.WhiteNoiseMiddleware' if env_config['whitenoise_enabled'] else '',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -140,39 +139,26 @@ TEMPLATES = [
     },
 ]
 
-# Configure storage for media files
+# Base url to serve media files
+MEDIA_URL = '/media/'
+
+# Path where media is stored (for local development fallback)
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Ensure the media directory exists
+os.makedirs(MEDIA_ROOT, exist_ok=True)
+
+# Configure WhiteNoise for static files in production, but not for media files
 if not DEBUG:
-    # Force Cloudinary for ALL media in production
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    
-    # Configure Cloudinary
-    CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'duoovd5y9'),
-        'API_KEY': os.getenv('CLOUDINARY_API_KEY', '228944556196295'),
-        'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', '4-he4Nls7J274KDH1AgDZ-ujt2M'),
-        'MEDIA_TAG': 'media',
-        'SECURE': True,
-        'STATIC_IMAGES_EXTENSIONS': ['jpg', 'jpe', 'jpeg', 'jpc', 'jp2', 'j2k', 'wdp', 'jxr', 
-                                    'hdp', 'png', 'gif', 'webp', 'bmp', 'tif', 'tiff', 'ico'],
-    }
-    
-    # Direct Cloudinary URL in production
-    MEDIA_URL = f'https://res.cloudinary.com/{CLOUDINARY_STORAGE["CLOUD_NAME"]}/image/upload/'
-    
-    # Force WhiteNoise for static files in production
     STATICFILES_STORAGE = env_config['static_storage']
-    
-    # Disable local media storage in production
-    MEDIA_ROOT = None
+    # Explicitly set media files to use Cloudinary in production
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 else:
     # In development, use default file storage
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-    # Ensure the media directory exists in development
-    os.makedirs(MEDIA_ROOT, exist_ok=True)
 
 WSGI_APPLICATION = 'blog_project.wsgi.application'
+
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -236,6 +222,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -259,12 +246,9 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# CKEditor Upload Path - this will use Cloudinary in production automatically
+# CKEditor Upload Path
 CKEDITOR_UPLOAD_PATH = 'uploads/'
 CKEDITOR_IMAGE_BACKEND = "pillow"
-
-# Make CKEditor work with Cloudinary in production
-CKEDITOR_STORAGE_BACKEND = DEFAULT_FILE_STORAGE
 
 # CKEditor Configuration
 CKEDITOR_CONFIGS = {
@@ -308,6 +292,12 @@ CKEDITOR_CONFIGS = {
         ]),
     }
 }
+
+CLOUDINARY_STORAGE = {
+    'CLOUDINARY_URL': os.getenv('CLOUDINARY_URL', "cloudinary://228944556196295:4-he4Nls7J274KDH1AgDZ-ujt2M@duoovd5y9"),
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

@@ -80,9 +80,6 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'fa3-blog.onrender.com',
     'www.fa3-blog.onrender.com',
-    '13.228.225.19',
-    '18.142.128.26',
-    '54.254.162.138'
 ]
 
 # Application definition
@@ -93,6 +90,9 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
+    # Cloudinary apps must come before django.contrib.staticfiles
+    'cloudinary',
+    'cloudinary_storage',
     'django.contrib.staticfiles',
     "crispy_forms",
     "crispy_bootstrap5",
@@ -101,6 +101,7 @@ INSTALLED_APPS = [
     'categories',
     'home',
     'ckeditor',
+    'ckeditor_uploader',  # Add CKEditor uploader app
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -109,7 +110,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware' if env_config['whitenoise_enabled'] else '',
+    # 'whitenoise.middleware.WhiteNoiseMiddleware' if env_config['whitenoise_enabled'] else '',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -151,11 +152,26 @@ os.makedirs(MEDIA_ROOT, exist_ok=True)
 # Configure WhiteNoise for static files in production, but not for media files
 if not DEBUG:
     STATICFILES_STORAGE = env_config['static_storage']
-    # Explicitly set media files to use Cloudinary in production
+    
+    # Force media files to use Cloudinary in production
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    
+    # Set CloudinaryMediaStorage as the default file storage for all media
+    CLOUDINARY_STORAGE = {
+        'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'duoovd5y9'),
+        'API_KEY': os.getenv('CLOUDINARY_API_KEY', '228944556196295'),
+        'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', '4-he4Nls7J274KDH1AgDZ-ujt2M'),
+        'MEDIA_TAG': 'media',
+        'SECURE': True,
+        'STATIC_IMAGES_EXTENSIONS': ['jpg', 'jpe', 'jpeg', 'jpc', 'jp2', 'j2k', 'wdp', 'jxr', 
+                                    'hdp', 'png', 'gif', 'webp', 'bmp', 'tif', 'tiff', 'ico'],
+    }
+    # Override the URL format to ensure it's using HTTPS
+    MEDIA_URL = 'https://res.cloudinary.com/' + CLOUDINARY_STORAGE['CLOUD_NAME'] + '/image/upload/'
 else:
     # In development, use default file storage
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    MEDIA_URL = '/media/'
 
 WSGI_APPLICATION = 'blog_project.wsgi.application'
 
@@ -294,10 +310,6 @@ CKEDITOR_CONFIGS = {
             'elementspath'
         ]),
     }
-}
-
-CLOUDINARY_STORAGE = {
-    'CLOUDINARY_URL': os.getenv('CLOUDINARY_URL', "cloudinary://228944556196295:4-he4Nls7J274KDH1AgDZ-ujt2M@duoovd5y9"),
 }
 
 # Default primary key field type

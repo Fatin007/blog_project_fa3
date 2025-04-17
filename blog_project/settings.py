@@ -12,8 +12,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
-import dj_database_url  # Commented for local development
+import dj_database_url 
 from dotenv import load_dotenv
+import cloudinary_storage
 
 load_dotenv()
 
@@ -71,8 +72,8 @@ def configure_environment(environment):
     return config
 
 
-# ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'development')
-ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'production')
+ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'development')
+# ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'production')
 env_config = configure_environment(ENVIRONMENT)
 
 # Quick-start development settings - unsuitable for production
@@ -196,6 +197,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
+
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
@@ -265,6 +267,14 @@ CKEDITOR_CONFIGS = {
         ]),
     }
 }
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': "duoovd5y9",
+    'API_KEY' : "228944556196295",
+    'API_SECRET' : "4-he4Nls7J274KDH1AgDZ-ujt2M",
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

@@ -56,24 +56,24 @@ def configure_environment(environment):
             'secure_browser_xss_filter': True,
             'secure_content_type_nosniff': True,
             'x_frame_options': 'DENY',
-            'database': dj_database_url.config(
-                default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
-                conn_max_age=600
-            )
+            # 'database': dj_database_url.config(
+            #     default='sqlite:///' + str(BASE_DIR / 'db.sqlite3'),
+            #     conn_max_age=600
+            # )
         })
-    else:  # development
-        config.update({
-            'database': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': BASE_DIR / 'db.sqlite3',
-            }
-        })
+    # else:  # development
+    #     config.update({
+    #         'database': {
+    #             'ENGINE': 'django.db.backends.sqlite3',
+    #             'NAME': BASE_DIR / 'db.sqlite3',
+    #         }
+    #     })
     
     return config
 
 
-ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'development')
-# ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'production')
+# ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'development')
+ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'production')
 env_config = configure_environment(ENVIRONMENT)
 
 # Quick-start development settings - unsuitable for production
@@ -174,9 +174,45 @@ WSGI_APPLICATION = 'blog_project.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
-    'default': env_config['database']
-}
+# Use dj-database-url to handle database configurations
+# This will look for DATABASE_URL in environment variables
+database_url = os.environ.get('DATABASE_URL')
+
+if database_url:
+    # If DATABASE_URL is provided, use it directly
+    DATABASES = {
+        'default': dj_database_url.config(default=database_url, conn_max_age=600)
+    }
+elif ENVIRONMENT.lower() == 'production':
+    # Production: Railway internal PostgreSQL connection
+    db_pass = os.environ.get('DB_PASS')
+    if db_pass:
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.postgresql',
+                'NAME': 'railway',
+                'USER': 'postgres',
+                'PASSWORD': db_pass,
+                'HOST': 'maglev.proxy.rlwy.net',
+                'PORT': '17987',
+            }
+        }
+    else:
+        # Fallback to SQLite if DB_PASS is not available
+        DATABASES = {
+            'default': {
+                'ENGINE': 'django.db.backends.sqlite3',
+                'NAME': BASE_DIR / 'db.sqlite3',
+            }
+        }
+# else:
+#     # Development: default to SQLite if no external database URL is provided
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators

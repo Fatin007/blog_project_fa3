@@ -49,6 +49,7 @@ def configure_environment(environment):
         config.update({
             'debug': False,
             'static_storage': 'cloudinary_storage.storage.StaticCloudinaryStorage',
+            'whitenoise_enabled': True,
             'secure_ssl_redirect': True,
             'session_cookie_secure': True,
             'csrf_cookie_secure': True,
@@ -245,9 +246,12 @@ STATICFILES_DIRS = [
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# CKEditor Upload Path
+# CKEditor Upload Path - this will use Cloudinary in production automatically
 CKEDITOR_UPLOAD_PATH = 'uploads/'
 CKEDITOR_IMAGE_BACKEND = "pillow"
+
+# Make CKEditor work with Cloudinary in production
+CKEDITOR_STORAGE_BACKEND = DEFAULT_FILE_STORAGE
 
 # CKEditor Configuration
 CKEDITOR_CONFIGS = {
@@ -295,8 +299,6 @@ CKEDITOR_CONFIGS = {
 CLOUDINARY_STORAGE = {
     'CLOUDINARY_URL': os.getenv('CLOUDINARY_URL', "cloudinary://228944556196295:4-he4Nls7J274KDH1AgDZ-ujt2M@duoovd5y9"),
 }
-
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

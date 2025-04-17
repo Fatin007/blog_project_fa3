@@ -153,20 +153,16 @@ TEMPLATES = [
 # Base url to serve media files
 MEDIA_URL = '/media/'
 
-# Path where media is stored
+# Path where media is stored (for local development fallback)
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # Ensure the media directory exists
 os.makedirs(MEDIA_ROOT, exist_ok=True)
 
-# Configure WhiteNoise for serving media files in production
+# Configure WhiteNoise for static files in production, but not for media files
 if not DEBUG:
     STATICFILES_STORAGE = env_config['static_storage']
-    # Configure WhiteNoise to serve media files
-    WHITENOISE_ROOT = os.path.join(BASE_DIR, 'media')
-    # Add media files to WhiteNoise's allowed paths
-    WHITENOISE_ALLOW_ALL_ORIGINS = True
-    WHITENOISE_INDEX_FILE = True
+    # Don't use WhiteNoise for media files, use Cloudinary instead
 
 WSGI_APPLICATION = 'blog_project.wsgi.application'
 
@@ -205,14 +201,14 @@ elif ENVIRONMENT.lower() == 'production':
                 'NAME': BASE_DIR / 'db.sqlite3',
             }
         }
-# else:
-#     # Development: default to SQLite if no external database URL is provided
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.sqlite3',
-#             'NAME': BASE_DIR / 'db.sqlite3',
-#         }
-#     }
+else:
+    # Development: default to SQLite if no external database URL is provided
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -305,9 +301,9 @@ CKEDITOR_CONFIGS = {
 }
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': "duoovd5y9",
-    'API_KEY' : "228944556196295",
-    'API_SECRET' : "4-he4Nls7J274KDH1AgDZ-ujt2M",
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', "duoovd5y9"),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY', "228944556196295"),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', "4-he4Nls7J274KDH1AgDZ-ujt2M"),
 }
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'

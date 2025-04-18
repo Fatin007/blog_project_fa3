@@ -81,14 +81,14 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
+    'cloudinary',
+    'cloudinary_storage',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     # Cloudinary apps must come before django.contrib.staticfiles
-    'cloudinary',
-    'cloudinary_storage',
     'django.contrib.staticfiles',
     "crispy_forms",
     "crispy_bootstrap5",
@@ -297,7 +297,7 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_FILE_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

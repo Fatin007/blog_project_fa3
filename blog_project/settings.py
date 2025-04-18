@@ -146,16 +146,17 @@ if not DEBUG:
         'SECURE': True,
     }
     
-    # Direct Cloudinary URL in production
-    MEDIA_URL = f'https://res.cloudinary.com/{CLOUDINARY_STORAGE["CLOUD_NAME"]}/image/upload/'
+    # Still keep a MEDIA_ROOT for temporary file handling
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+    os.makedirs(MEDIA_ROOT, exist_ok=True)
+    
+    # Use standard media URL pattern (Cloudinary storage will handle the actual storage)
+    MEDIA_URL = '/media/'
     
     # CKEditor settings for Cloudinary
     CKEDITOR_UPLOAD_PATH = 'uploads/'
     CKEDITOR_IMAGE_BACKEND = "pillow"
     CKEDITOR_STORAGE_BACKEND = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    
-    # Disable local media storage in production
-    MEDIA_ROOT = None
 else:
     # In development, use default file storage
     DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'

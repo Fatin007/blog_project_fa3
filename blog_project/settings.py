@@ -132,13 +132,13 @@ TEMPLATES = [
 ]
 
 # Base url to serve media files
-MEDIA_URL = '/media/'
+# MEDIA_URL = '/media/'
 
-# Path where media is stored (for local development fallback)
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# # Path where media is stored (for local development fallback)
+# MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Ensure the media directory exists
-os.makedirs(MEDIA_ROOT, exist_ok=True)
+# # Ensure the media directory exists
+# os.makedirs(MEDIA_ROOT, exist_ok=True)
 
 # Configure WhiteNoise for static files in production, but not for media files
 if not DEBUG:
@@ -230,13 +230,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
+# STATIC_URL = 'static/'
 
-STATICFILES_DIRS = [
-    BASE_DIR / 'static',
-]
+# STATICFILES_DIRS = [
+#     BASE_DIR / 'static',
+# ]
 
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+# STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # CKEditor Upload Path
 CKEDITOR_UPLOAD_PATH = 'uploads/'

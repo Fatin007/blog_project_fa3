@@ -12,11 +12,16 @@ urlpatterns = [
     path('category/', include('categories.urls')),
     path('category/<slug:slug>/', views.home, name='category_posts'),
     path('', include('home.urls')),
-    path('ckeditor5/', include('django_ckeditor_5.urls')),  # Add CKEditor 5 URLs
+    path('ckeditor5/', include('django_ckeditor_5.urls')),  # CKEditor 5 URLs
 ]
 
-# Serve media files in both development and production
-# This ensures the URLs still work even though actual storage might be Cloudinary in production
-urlpatterns += [
-    path('media/<path:path>', serve, {'document_root': settings.MEDIA_ROOT}),
-]
+# Serve media files in development and provide URL patterns for Cloudinary in production
+# This ensures consistent URL structure regardless of storage backend
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+else:
+    urlpatterns += [
+        path('media/<path:path>', serve, {
+            'document_root': settings.MEDIA_ROOT,
+        }),
+    ]

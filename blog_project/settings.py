@@ -201,10 +201,15 @@ CKEDITOR_5_CONFIGS = {
 }
 
 # Path for CKEditor 5 uploads
-CKEDITOR_5_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage' if not DEBUG else 'django.core.files.storage.FileSystemStorage'
+CKEDITOR_5_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 CKEDITOR_5_UPLOAD_PATH = 'uploads/ckeditor/'
+CKEDITOR_5_STATIC_URL = os.path.join(STATIC_URL, 'django_ckeditor_5/')
+CKEDITOR_5_MEDIA_URL = MEDIA_URL + 'uploads/ckeditor/'
+
+# Media configuration - setting these before WSGI ensures all components use the same values
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+os.makedirs(MEDIA_ROOT, exist_ok=True)
 
 WSGI_APPLICATION = 'blog_project.wsgi.application'
 
@@ -314,10 +319,38 @@ if ENVIRONMENT.lower() == 'production':
 # Static files configuration with WhiteNoise
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' if ENVIRONMENT.lower() == 'production' else 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
-# Configure storage for media files
+# WhiteNoise configuration
+WHITENOISE_MIMETYPES = {
+    '.js': 'application/javascript',
+    '.css': 'text/css',
+    '.woff': 'font/woff',
+    '.woff2': 'font/woff2',
+    '.ttf': 'font/ttf',
+    '.png': 'image/png',
+    '.jpg': 'image/jpeg',
+    '.gif': 'image/gif',
+    '.svg': 'image/svg+xml',
+}
+
+# Update WhiteNoise settings to properly handle CKEditor
+WHITENOISE_MAX_AGE = 31536000 if ENVIRONMENT.lower() == 'production' else 0
+WHITENOISE_SKIP_COMPRESS_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'zip', 'gz', 'tgz', 'bz2', 'tbz', 'xz', 'br', 'swf', 'flv', 'woff', 'woff2', 'svg']
+
+# Exclude CKEditor files from WhiteNoise compression
+WHITENOISE_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+# Add CSP settings that might interfere with CKEditor in production
+CSP_DEFAULT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'", "*.cloudinary.com")
+CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "*.cloudinary.com")
+CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'", "*.cloudinary.com")
+CSP_IMG_SRC = ("'self'", "*.cloudinary.com", "data:")
+CSP_FONT_SRC = ("'self'", "*.cloudinary.com", "data:")
+CSP_CONNECT_SRC = ("'self'", "*.cloudinary.com")
+
+# Configure storage for media files - use Cloudinary for all media storage
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-# Configure Cloudinary
+# Override these settings to ensure Cloudinary works correctly with all media types
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'duoovd5y9'),
     'API_KEY': os.getenv('CLOUDINARY_API_KEY', '228944556196295'),
@@ -325,14 +358,17 @@ CLOUDINARY_STORAGE = {
     'SECURE': True,
     'MEDIA_TAG': 'media',
     'STATIC_TAG': 'static',
-    'STATIC_IMAGES_EXTENSIONS': ['jpg', 'jpe', 'jpeg', 'jpc', 'jp2', 'j2k', 'wdp', 'jxr',
-                                'hdp', 'png', 'gif', 'webp', 'bmp', 'tif', 'tiff', 'ico'],
     'INVALID_VIDEO_ERROR_MESSAGE': 'Please upload a valid video file.',
     'EXCLUDE_DELETE_ORPHANED_MEDIA_PATHS': [],
+    # Add these to ensure CKEditor images are properly handled
+    'STATICFILES_MANIFEST_ROOT': os.path.join(BASE_DIR, 'staticfiles'),
+    'STATIC_IMAGES_EXTENSIONS': ['jpg', 'jpe', 'jpeg', 'jpc', 'jp2', 'j2k', 'wdp', 'jxr',
+                               'hdp', 'png', 'gif', 'webp', 'bmp', 'tif', 'tiff', 'ico', 'svg'],
+    # Add Resource Types to better handle media types
+    'RESOURCE_TYPES': {
+        'image': ['jpg', 'jpe', 'jpeg', 'jpc', 'jp2', 'j2k', 'wdp', 'jxr', 'hdp', 
+                 'png', 'gif', 'webp', 'bmp', 'tif', 'tiff', 'ico', 'svg'],
+        'video': ['mp4', 'webm', 'flv', 'mov', 'ogv', 'avi', 'wmv', 'mpg', 'mpeg', '3gp', 'm3u8'],
+        'raw': ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'csv', 'txt', 'rtf'],
+    }
 }
-
-# Media configuration
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-# Ensure the media directory exists in development
-os.makedirs(MEDIA_ROOT, exist_ok=True)

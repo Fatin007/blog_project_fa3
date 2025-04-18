@@ -57,8 +57,8 @@ def configure_environment(environment):
     return config
 
 
-# ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'development')
-ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'production')
+ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'development')
+# ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'production')
 env_config = configure_environment(ENVIRONMENT)
 
 # Quick-start development settings - unsuitable for production
@@ -286,6 +286,9 @@ CKEDITOR_CONFIGS = {
 }
 
 CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUD_NAME', "duoovd5y9"),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY', "228944556196295"),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', "4-he4Nls7J274KDH1AgDZ-ujt2M"),
     'CLOUDINARY_URL': os.getenv('CLOUDINARY_URL', "cloudinary://228944556196295:4-he4Nls7J274KDH1AgDZ-ujt2M@duoovd5y9"),
 }
 

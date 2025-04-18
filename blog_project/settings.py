@@ -200,16 +200,23 @@ CKEDITOR_5_CONFIGS = {
     }
 }
 
+# CKEditor 5 settings
+CKEDITOR_5_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+CKEDITOR_5_UPLOAD_PATH = 'uploads/ckeditor/'
+
+# Media settings
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+os.makedirs(MEDIA_ROOT, exist_ok=True)
+
+STATIC_URL = '/static/'
+
 # Path for CKEditor 5 uploads
 CKEDITOR_5_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 CKEDITOR_5_UPLOAD_PATH = 'uploads/ckeditor/'
 CKEDITOR_5_STATIC_URL = os.path.join(STATIC_URL, 'django_ckeditor_5/')
 CKEDITOR_5_MEDIA_URL = MEDIA_URL + 'uploads/ckeditor/'
 
-# Media configuration - setting these before WSGI ensures all components use the same values
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-os.makedirs(MEDIA_ROOT, exist_ok=True)
 
 WSGI_APPLICATION = 'blog_project.wsgi.application'
 
@@ -350,25 +357,10 @@ CSP_CONNECT_SRC = ("'self'", "*.cloudinary.com")
 # Configure storage for media files - use Cloudinary for all media storage
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-# Override these settings to ensure Cloudinary works correctly with all media types
+# Cloudinary configuration
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'duoovd5y9'),
     'API_KEY': os.getenv('CLOUDINARY_API_KEY', '228944556196295'),
     'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', '4-he4Nls7J274KDH1AgDZ-ujt2M'),
     'SECURE': True,
-    'MEDIA_TAG': 'media',
-    'STATIC_TAG': 'static',
-    'INVALID_VIDEO_ERROR_MESSAGE': 'Please upload a valid video file.',
-    'EXCLUDE_DELETE_ORPHANED_MEDIA_PATHS': [],
-    # Add these to ensure CKEditor images are properly handled
-    'STATICFILES_MANIFEST_ROOT': os.path.join(BASE_DIR, 'staticfiles'),
-    'STATIC_IMAGES_EXTENSIONS': ['jpg', 'jpe', 'jpeg', 'jpc', 'jp2', 'j2k', 'wdp', 'jxr',
-                               'hdp', 'png', 'gif', 'webp', 'bmp', 'tif', 'tiff', 'ico', 'svg'],
-    # Add Resource Types to better handle media types
-    'RESOURCE_TYPES': {
-        'image': ['jpg', 'jpe', 'jpeg', 'jpc', 'jp2', 'j2k', 'wdp', 'jxr', 'hdp', 
-                 'png', 'gif', 'webp', 'bmp', 'tif', 'tiff', 'ico', 'svg'],
-        'video': ['mp4', 'webm', 'flv', 'mov', 'ogv', 'avi', 'wmv', 'mpg', 'mpeg', '3gp', 'm3u8'],
-        'raw': ['pdf', 'doc', 'docx', 'ppt', 'pptx', 'xls', 'xlsx', 'csv', 'txt', 'rtf'],
-    }
 }

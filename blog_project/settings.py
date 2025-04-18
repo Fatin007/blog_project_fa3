@@ -142,7 +142,6 @@ os.makedirs(MEDIA_ROOT, exist_ok=True)
 
 # Configure WhiteNoise for static files in production, but not for media files
 if not DEBUG:
-    STATICFILES_STORAGE = env_config['static_storage']
     # Explicitly set media files to use Cloudinary in production
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 else:

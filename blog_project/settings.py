@@ -104,6 +104,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Add WhiteNoise for static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -303,34 +304,32 @@ SECURE_BROWSER_XSS_FILTER = env_config['secure_browser_xss_filter']
 SECURE_CONTENT_TYPE_NOSNIFF = env_config['secure_content_type_nosniff']
 X_FRAME_OPTIONS = env_config['x_frame_options']
 
+# Additional security settings for production
+if ENVIRONMENT.lower() == 'production':
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Static files configuration with WhiteNoise
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' if ENVIRONMENT.lower() == 'production' else 'django.contrib.staticfiles.storage.StaticFilesStorage'
+
 # Configure storage for media files
-if not DEBUG:
-    # Force Cloudinary for ALL media in production
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    
-    # Configure Cloudinary
-    CLOUDINARY_STORAGE = {
-        'CLOUDINARY_URL': os.getenv('CLOUDINARY_URL', 'cloudinary://228944556196295:4-he4Nls7J274KDH1AgDZ-ujt2M@duoovd5y9'),
-        'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'duoovd5y9'),
-        'API_KEY': os.getenv('CLOUDINARY_API_KEY', '228944556196295'),
-        'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', '4-he4Nls7J274KDH1AgDZ-ujt2M'),
-        'MEDIA_TAG': 'media',
-        'SECURE': True,
-    }
-else:
-    # In development, use default file storage
-    # DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    
-    # Configure Cloudinary
-    CLOUDINARY_STORAGE = {
-        'CLOUDINARY_URL': os.getenv('CLOUDINARY_URL', 'cloudinary://228944556196295:4-he4Nls7J274KDH1AgDZ-ujt2M@duoovd5y9'),
-        'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'duoovd5y9'),
-        'API_KEY': os.getenv('CLOUDINARY_API_KEY', '228944556196295'),
-        'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', '4-he4Nls7J274KDH1AgDZ-ujt2M'),
-        'MEDIA_TAG': 'media',
-        'SECURE': True,
-    }
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# Configure Cloudinary
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'duoovd5y9'),
+    'API_KEY': os.getenv('CLOUDINARY_API_KEY', '228944556196295'),
+    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', '4-he4Nls7J274KDH1AgDZ-ujt2M'),
+    'SECURE': True,
+    'MEDIA_TAG': 'media',
+    'STATIC_TAG': 'static',
+    'STATIC_IMAGES_EXTENSIONS': ['jpg', 'jpe', 'jpeg', 'jpc', 'jp2', 'j2k', 'wdp', 'jxr',
+                                'hdp', 'png', 'gif', 'webp', 'bmp', 'tif', 'tiff', 'ico'],
+    'INVALID_VIDEO_ERROR_MESSAGE': 'Please upload a valid video file.',
+    'EXCLUDE_DELETE_ORPHANED_MEDIA_PATHS': [],
+}
 
 # Media configuration
 MEDIA_URL = '/media/'

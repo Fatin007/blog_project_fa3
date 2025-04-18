@@ -10,3 +10,5 @@ django-ckeditor-5>=0.2.8
 requests>=2.31.0
 cloudinary>=1.33.0
 django-cloudinary-storage>=0.3.0
+whitenoise>=6.5.0
+django-storages>=1.14.0

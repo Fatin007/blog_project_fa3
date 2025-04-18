@@ -35,8 +35,6 @@ def configure_environment(environment):
     """
     config = {
         'debug': True,
-        'whitenoise_enabled': False,
-        'static_storage': 'django.contrib.staticfiles.storage.StaticFilesStorage',
         'secure_ssl_redirect': False,
         'session_cookie_secure': False,
         'csrf_cookie_secure': False,
@@ -48,8 +46,6 @@ def configure_environment(environment):
     if environment.lower() == 'production':
         config.update({
             'debug': False,
-            'static_storage': 'cloudinary_storage.storage.StaticCloudinaryStorage',
-            'whitenoise_enabled': True,
             'secure_ssl_redirect': True,
             'session_cookie_secure': True,
             'csrf_cookie_secure': True,
@@ -80,9 +76,6 @@ ALLOWED_HOSTS = [
     '127.0.0.1',
     'fa3-blog.onrender.com',
     'www.fa3-blog.onrender.com',
-    '13.228.225.19',
-    '18.142.128.26',
-    '54.254.162.138'
 ]
 
 # Application definition
@@ -109,7 +102,6 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware' if env_config['whitenoise_enabled'] else '',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -155,7 +147,8 @@ if not DEBUG:
     DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 else:
     # In development, use default file storage
-    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    # DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 
 WSGI_APPLICATION = 'blog_project.wsgi.application'
 

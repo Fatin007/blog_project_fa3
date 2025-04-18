@@ -1,13 +1,10 @@
 from django import forms
 from .models import Post, Comment
-from ckeditor.widgets import CKEditorWidget
+from django_ckeditor_5.widgets import CKEditor5Widget
 
 class PostForm(forms.ModelForm):
-    body = forms.CharField(widget=CKEditorWidget())
-    
     class Meta:
         model = Post
-        # fields = '__all__'
         exclude = ['author', 'view_count']
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter post title'}),
@@ -17,6 +14,10 @@ class PostForm(forms.ModelForm):
                 'multiple': 'multiple'
             }),
             'image': forms.FileInput(attrs={'class': 'form-control'}),
+            'body': CKEditor5Widget(
+                config_name='extends',
+                attrs={'class': 'django_ckeditor_5'},
+            )
         }
 
 class CommentForm(forms.ModelForm):

@@ -57,8 +57,8 @@ def configure_environment(environment):
     return config
 
 
-# ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'development')
-ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'production')
+ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'development')
+# ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'production')
 env_config = configure_environment(ENVIRONMENT)
 
 # Quick-start development settings - unsuitable for production
@@ -81,14 +81,13 @@ ALLOWED_HOSTS = [
 # Application definition
 
 INSTALLED_APPS = [
-    'cloudinary',
-    'cloudinary_storage',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    # Cloudinary apps must come before django.contrib.staticfiles
+    'cloudinary',
+    'cloudinary_storage',
     'django.contrib.staticfiles',
     "crispy_forms",
     "crispy_bootstrap5",
@@ -96,8 +95,7 @@ INSTALLED_APPS = [
     'posts',
     'categories',
     'home',
-    'ckeditor',
-    'ckeditor_uploader',  # Add CKEditor uploader app
+    'django_ckeditor_5',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
@@ -132,89 +130,82 @@ TEMPLATES = [
     },
 ]
 
-# Configure storage for media files
-if not DEBUG:
-    # Force Cloudinary for ALL media in production
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    
-    # Configure Cloudinary
-    CLOUDINARY_STORAGE = {
-        'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'duoovd5y9'),
-        'API_KEY': os.getenv('CLOUDINARY_API_KEY', '228944556196295'),
-        'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', '4-he4Nls7J274KDH1AgDZ-ujt2M'),
-        'MEDIA_TAG': 'media',
-        'SECURE': True,
-    }
-    
-    # Still keep a MEDIA_ROOT for temporary file handling
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-    os.makedirs(MEDIA_ROOT, exist_ok=True)
-    
-    # Use standard media URL pattern (Cloudinary storage will handle the actual storage)
-    MEDIA_URL = '/media/'
-    
-    # CKEditor settings for Cloudinary
-    CKEDITOR_UPLOAD_PATH = 'uploads/'
-    CKEDITOR_IMAGE_BACKEND = "pillow"
-    CKEDITOR_STORAGE_BACKEND = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-else:
-    # In development, use default file storage
-    DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-    MEDIA_URL = '/media/'
-    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-    
-    # Ensure the media directory exists in development
-    os.makedirs(MEDIA_ROOT, exist_ok=True)
-    
-    # CKEditor settings for local storage
-    CKEDITOR_UPLOAD_PATH = 'uploads/'
-    CKEDITOR_IMAGE_BACKEND = "pillow"
-    CKEDITOR_STORAGE_BACKEND = DEFAULT_FILE_STORAGE
+# CKEditor 5 Configuration
+customColorPalette = [
+    {"color": "hsl(4, 90%, 58%)", "label": "Red"},
+    {"color": "hsl(340, 82%, 52%)", "label": "Pink"},
+    {"color": "hsl(291, 64%, 42%)", "label": "Purple"},
+    {"color": "hsl(262, 52%, 47%)", "label": "Deep Purple"},
+    {"color": "hsl(231, 48%, 48%)", "label": "Indigo"},
+    {"color": "hsl(207, 90%, 54%)", "label": "Blue"},
+]
 
-WSGI_APPLICATION = 'blog_project.wsgi.application'
-
-# CKEditor Configuration
-CKEDITOR_CONFIGS = {
+CKEDITOR_5_CONFIGS = {
     'default': {
-        'skin': 'moono-lisa',
-        'toolbar_Basic': [
-            ['Source', '-', 'Bold', 'Italic']
+        'toolbar': ['heading', '|', 'bold', 'italic', 'link',
+                    'bulletedList', 'numberedList', 'blockQuote', 'imageUpload', ],
+    },
+    'extends': {
+        'blockToolbar': [
+            'paragraph', 'heading1', 'heading2', 'heading3',
+            '|',
+            'bulletedList', 'numberedList',
+            '|',
+            'blockQuote',
         ],
-        'toolbar_Full': [
-            ['Styles', 'Format', 'Bold', 'Italic', 'Underline', 'Strike', 'SpellChecker', 'Undo', 'Redo'],
-            ['Link', 'Unlink', 'Anchor'],
-            ['Image', 'Flash', 'Table', 'HorizontalRule'],
-            ['TextColor', 'BGColor'],
-            ['Smiley', 'SpecialChar'], ['Source'],
-            ['JustifyLeft','JustifyCenter','JustifyRight','JustifyBlock'],
-            ['NumberedList','BulletedList'],
-            ['Indent','Outdent'],
-            ['Maximize'],
-        ],
-        'toolbar': 'Full',
-        'height': 300,
-        'width': '100%',
-        'filebrowserWindowHeight': 725,
-        'filebrowserWindowWidth': 940,
-        'toolbarCanCollapse': True,
-        'mathJaxLib': '//cdn.mathjax.org/mathjax/2.2-latest/MathJax.js?config=TeX-AMS_HTML',
-        'tabSpaces': 4,
-        'extraPlugins': ','.join([
-            'uploadimage',
-            'div',
-            'autolink',
-            'autoembed',
-            'embedsemantic',
-            'autogrow',
-            'widget',
-            'lineutils',
-            'clipboard',
-            'dialog',
-            'dialogui',
-            'elementspath'
-        ]),
+        'toolbar': ['heading', '|', 'outdent', 'indent', '|', 'bold', 'italic', 'link', 'underline', 'strikethrough',
+                'code','subscript', 'superscript', 'highlight', '|', 'codeBlock',
+                'bulletedList', 'numberedList', 'todoList', '|',  'blockQuote', 'insertImage', '|',
+                'fontSize', 'fontFamily', 'fontColor', 'fontBackgroundColor', 'mediaEmbed', 'removeFormat',
+                'insertTable',],
+        'image': {
+            'toolbar': ['imageTextAlternative', 'imageTitle', '|', 'imageStyle:alignLeft', 'imageStyle:full',
+                        'imageStyle:alignRight', 'imageStyle:alignCenter', 'imageStyle:side',  '|'],
+            'styles': [
+                'full',
+                'side',
+                'alignLeft',
+                'alignRight',
+                'alignCenter',
+            ]
+        },
+        'table': {
+            'contentToolbar': [ 'tableColumn', 'tableRow', 'mergeTableCells',
+            'tableProperties', 'tableCellProperties' ],
+            'tableProperties': {
+                'borderColors': customColorPalette,
+                'backgroundColors': customColorPalette
+            },
+            'tableCellProperties': {
+                'borderColors': customColorPalette,
+                'backgroundColors': customColorPalette
+            }
+        },
+        'heading' : {
+            'options': [
+                { 'model': 'paragraph', 'title': 'Paragraph', 'class': 'ck-heading_paragraph' },
+                { 'model': 'heading1', 'view': 'h1', 'title': 'Heading 1', 'class': 'ck-heading_heading1' },
+                { 'model': 'heading2', 'view': 'h2', 'title': 'Heading 2', 'class': 'ck-heading_heading2' },
+                { 'model': 'heading3', 'view': 'h3', 'title': 'Heading 3', 'class': 'ck-heading_heading3' }
+            ]
+        }
+    },
+    'list': {
+        'properties': {
+            'styles': 'true',
+            'startIndex': 'true',
+            'reversed': 'true',
+        }
     }
 }
+
+# Path for CKEditor 5 uploads
+CKEDITOR_5_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage' if not DEBUG else 'django.core.files.storage.FileSystemStorage'
+CKEDITOR_5_UPLOAD_PATH = 'uploads/ckeditor/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+WSGI_APPLICATION = 'blog_project.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
@@ -297,7 +288,7 @@ STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
 
-STATIC_FILE_STORAGE = 'cloudinary_storage.storage.StaticHashedCloudinaryStorage'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
@@ -311,3 +302,38 @@ CSRF_COOKIE_SECURE = env_config['csrf_cookie_secure']
 SECURE_BROWSER_XSS_FILTER = env_config['secure_browser_xss_filter']
 SECURE_CONTENT_TYPE_NOSNIFF = env_config['secure_content_type_nosniff']
 X_FRAME_OPTIONS = env_config['x_frame_options']
+
+# Configure storage for media files
+if not DEBUG:
+    # Force Cloudinary for ALL media in production
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    
+    # Configure Cloudinary
+    CLOUDINARY_STORAGE = {
+        'CLOUDINARY_URL': os.getenv('CLOUDINARY_URL', 'cloudinary://228944556196295:4-he4Nls7J274KDH1AgDZ-ujt2M@duoovd5y9'),
+        'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'duoovd5y9'),
+        'API_KEY': os.getenv('CLOUDINARY_API_KEY', '228944556196295'),
+        'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', '4-he4Nls7J274KDH1AgDZ-ujt2M'),
+        'MEDIA_TAG': 'media',
+        'SECURE': True,
+    }
+else:
+    # In development, use default file storage
+    # DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    
+    # Configure Cloudinary
+    CLOUDINARY_STORAGE = {
+        'CLOUDINARY_URL': os.getenv('CLOUDINARY_URL', 'cloudinary://228944556196295:4-he4Nls7J274KDH1AgDZ-ujt2M@duoovd5y9'),
+        'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'duoovd5y9'),
+        'API_KEY': os.getenv('CLOUDINARY_API_KEY', '228944556196295'),
+        'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', '4-he4Nls7J274KDH1AgDZ-ujt2M'),
+        'MEDIA_TAG': 'media',
+        'SECURE': True,
+    }
+
+# Media configuration
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# Ensure the media directory exists in development
+os.makedirs(MEDIA_ROOT, exist_ok=True)

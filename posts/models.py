@@ -1,12 +1,12 @@
 from django.db import models
 from categories.models import Category
 from django.contrib.auth.models import User
-from ckeditor.fields import RichTextField 
+from django_ckeditor_5.fields import CKEditor5Field
 
 # Create your models here.
 class Post(models.Model):
     title = models.CharField(max_length=500)
-    body = RichTextField()
+    body = CKEditor5Field('Content', config_name='extends')
     category = models.ManyToManyField(Category)
     author = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)

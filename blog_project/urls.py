@@ -12,7 +12,7 @@ urlpatterns = [
     path('category/', include('categories.urls')),
     path('category/<slug:slug>/', views.home, name='category_posts'),
     path('', include('home.urls')),
-    path('ckeditor/', include('ckeditor_uploader.urls')),  # Add CKEditor upload URLs
+    path('ckeditor5/', include('django_ckeditor_5.urls')),  # Add CKEditor 5 URLs
 ]
 
 # Serve media files in both development and production

@@ -104,7 +104,6 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',  # Add WhiteNoise for static files
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -200,23 +199,11 @@ CKEDITOR_5_CONFIGS = {
     }
 }
 
-# CKEditor 5 settings
-CKEDITOR_5_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+# Path for CKEditor 5 uploads
+CKEDITOR_5_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage' if not DEBUG else 'django.core.files.storage.FileSystemStorage'
 CKEDITOR_5_UPLOAD_PATH = 'uploads/ckeditor/'
-
-# Media settings
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-os.makedirs(MEDIA_ROOT, exist_ok=True)
-
-STATIC_URL = '/static/'
-
-# Path for CKEditor 5 uploads
-CKEDITOR_5_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-CKEDITOR_5_UPLOAD_PATH = 'uploads/ckeditor/'
-CKEDITOR_5_STATIC_URL = os.path.join(STATIC_URL, 'django_ckeditor_5/')
-CKEDITOR_5_MEDIA_URL = MEDIA_URL + 'uploads/ckeditor/'
-
 
 WSGI_APPLICATION = 'blog_project.wsgi.application'
 
@@ -316,51 +303,37 @@ SECURE_BROWSER_XSS_FILTER = env_config['secure_browser_xss_filter']
 SECURE_CONTENT_TYPE_NOSNIFF = env_config['secure_content_type_nosniff']
 X_FRAME_OPTIONS = env_config['x_frame_options']
 
-# Additional security settings for production
-if ENVIRONMENT.lower() == 'production':
-    SECURE_HSTS_SECONDS = 31536000  # 1 year
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-    SECURE_HSTS_PRELOAD = True
-    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# Configure storage for media files
+if not DEBUG:
+    # Force Cloudinary for ALL media in production
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    
+    # Configure Cloudinary
+    CLOUDINARY_STORAGE = {
+        'CLOUDINARY_URL': os.getenv('CLOUDINARY_URL', 'cloudinary://228944556196295:4-he4Nls7J274KDH1AgDZ-ujt2M@duoovd5y9'),
+        'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'duoovd5y9'),
+        'API_KEY': os.getenv('CLOUDINARY_API_KEY', '228944556196295'),
+        'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', '4-he4Nls7J274KDH1AgDZ-ujt2M'),
+        'MEDIA_TAG': 'media',
+        'SECURE': True,
+    }
+else:
+    # In development, use default file storage
+    # DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    
+    # Configure Cloudinary
+    CLOUDINARY_STORAGE = {
+        'CLOUDINARY_URL': os.getenv('CLOUDINARY_URL', 'cloudinary://228944556196295:4-he4Nls7J274KDH1AgDZ-ujt2M@duoovd5y9'),
+        'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'duoovd5y9'),
+        'API_KEY': os.getenv('CLOUDINARY_API_KEY', '228944556196295'),
+        'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', '4-he4Nls7J274KDH1AgDZ-ujt2M'),
+        'MEDIA_TAG': 'media',
+        'SECURE': True,
+    }
 
-# Static files configuration with WhiteNoise
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage' if ENVIRONMENT.lower() == 'production' else 'django.contrib.staticfiles.storage.StaticFilesStorage'
-
-# WhiteNoise configuration
-WHITENOISE_MIMETYPES = {
-    '.js': 'application/javascript',
-    '.css': 'text/css',
-    '.woff': 'font/woff',
-    '.woff2': 'font/woff2',
-    '.ttf': 'font/ttf',
-    '.png': 'image/png',
-    '.jpg': 'image/jpeg',
-    '.gif': 'image/gif',
-    '.svg': 'image/svg+xml',
-}
-
-# Update WhiteNoise settings to properly handle CKEditor
-WHITENOISE_MAX_AGE = 31536000 if ENVIRONMENT.lower() == 'production' else 0
-WHITENOISE_SKIP_COMPRESS_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'zip', 'gz', 'tgz', 'bz2', 'tbz', 'xz', 'br', 'swf', 'flv', 'woff', 'woff2', 'svg']
-
-# Exclude CKEditor files from WhiteNoise compression
-WHITENOISE_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-# Add CSP settings that might interfere with CKEditor in production
-CSP_DEFAULT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'", "*.cloudinary.com")
-CSP_STYLE_SRC = ("'self'", "'unsafe-inline'", "*.cloudinary.com")
-CSP_SCRIPT_SRC = ("'self'", "'unsafe-inline'", "'unsafe-eval'", "*.cloudinary.com")
-CSP_IMG_SRC = ("'self'", "*.cloudinary.com", "data:")
-CSP_FONT_SRC = ("'self'", "*.cloudinary.com", "data:")
-CSP_CONNECT_SRC = ("'self'", "*.cloudinary.com")
-
-# Configure storage for media files - use Cloudinary for all media storage
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
-# Cloudinary configuration
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'duoovd5y9'),
-    'API_KEY': os.getenv('CLOUDINARY_API_KEY', '228944556196295'),
-    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', '4-he4Nls7J274KDH1AgDZ-ujt2M'),
-    'SECURE': True,
-}
+# Media configuration
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# Ensure the media directory exists in development
+os.makedirs(MEDIA_ROOT, exist_ok=True)

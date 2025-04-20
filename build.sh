@@ -9,8 +9,12 @@ pip install -r requirements.txt
 mkdir -p media
 chmod 755 media
 
-# Collect static files
-python manage.py collectstatic --no-input
+# Create directory for CKEditor uploads
+mkdir -p media/uploads/ckeditor
+chmod 755 media/uploads/ckeditor
+
+# Collect static files with clear flag to ensure clean collection
+python manage.py collectstatic --no-input --clear
 
 # Run migrations
-python manage.py migrate 
+python manage.py migrate

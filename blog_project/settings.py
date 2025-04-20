@@ -57,15 +57,15 @@ def configure_environment(environment):
     return config
 
 
-# ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'development')
-ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'production')
+ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'development')
+# ENVIRONMENT = os.getenv('DJANGO_ENVIRONMENT', 'production')
 env_config = configure_environment(ENVIRONMENT)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-8=l2$w^s57g2k#h-0*4n1*f#c=_4t2(pjtm6x4_^8!a0tx@u^y')
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env_config['debug']
@@ -200,7 +200,8 @@ CKEDITOR_5_CONFIGS = {
 }
 
 # Path for CKEditor 5 uploads
-CKEDITOR_5_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage' if not DEBUG else 'django.core.files.storage.FileSystemStorage'
+# CKEDITOR_5_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage' if not DEBUG else 'django.core.files.storage.FileSystemStorage'
+CKEDITOR_5_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
 CKEDITOR_5_UPLOAD_PATH = 'uploads/ckeditor/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -212,43 +213,48 @@ WSGI_APPLICATION = 'blog_project.wsgi.application'
 
 # Use dj-database-url to handle database configurations
 # This will look for DATABASE_URL in environment variables
-database_url = os.environ.get('DATABASE_URL')
+# database_url = os.environ.get('DATABASE_URL')
 
-if database_url:
-    # If DATABASE_URL is provided, use it directly
-    DATABASES = {
-        'default': dj_database_url.config(default=database_url, conn_max_age=600)
+# if database_url:
+#     DATABASES = {
+#         'default': dj_database_url.config(default=database_url, conn_max_age=600)
+#     }
+# elif ENVIRONMENT.lower() == 'production':
+#     # Production: Railway internal PostgreSQL connection
+#     db_pass = os.environ.get('DB_PASS')
+#     if db_pass:
+#         DATABASES = {
+#             'default': {
+#                 'ENGINE': 'django.db.backends.postgresql',
+#                 'NAME': 'railway',
+#                 'USER': 'postgres',
+#                 'PASSWORD': db_pass,
+#                 'HOST': 'maglev.proxy.rlwy.net',
+#                 'PORT': '17987',
+#             }
+#         }
+#     else:
+#         # Fallback to SQLite if DB_PASS is not available
+#         DATABASES = {
+#             'default': {
+#                 'ENGINE': 'django.db.backends.sqlite3',
+#                 'NAME': BASE_DIR / 'db.sqlite3',
+#             }
+#         }
+# else:
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-elif ENVIRONMENT.lower() == 'production':
-    # Production: Railway internal PostgreSQL connection
-    db_pass = os.environ.get('DB_PASS')
-    if db_pass:
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.postgresql',
-                'NAME': 'railway',
-                'USER': 'postgres',
-                'PASSWORD': db_pass,
-                'HOST': 'maglev.proxy.rlwy.net',
-                'PORT': '17987',
-            }
-        }
-    else:
-        # Fallback to SQLite if DB_PASS is not available
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.sqlite3',
-                'NAME': BASE_DIR / 'db.sqlite3',
-            }
-        }
-else:
-    # Development: default to SQLite if no external database URL is provided
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -302,38 +308,3 @@ CSRF_COOKIE_SECURE = env_config['csrf_cookie_secure']
 SECURE_BROWSER_XSS_FILTER = env_config['secure_browser_xss_filter']
 SECURE_CONTENT_TYPE_NOSNIFF = env_config['secure_content_type_nosniff']
 X_FRAME_OPTIONS = env_config['x_frame_options']
-
-# Configure storage for media files
-if not DEBUG:
-    # Force Cloudinary for ALL media in production
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    
-    # Configure Cloudinary
-    CLOUDINARY_STORAGE = {
-        'CLOUDINARY_URL': os.getenv('CLOUDINARY_URL', 'cloudinary://228944556196295:4-he4Nls7J274KDH1AgDZ-ujt2M@duoovd5y9'),
-        'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'duoovd5y9'),
-        'API_KEY': os.getenv('CLOUDINARY_API_KEY', '228944556196295'),
-        'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', '4-he4Nls7J274KDH1AgDZ-ujt2M'),
-        'MEDIA_TAG': 'media',
-        'SECURE': True,
-    }
-else:
-    # In development, use default file storage
-    # DEFAULT_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-    
-    # Configure Cloudinary
-    CLOUDINARY_STORAGE = {
-        'CLOUDINARY_URL': os.getenv('CLOUDINARY_URL', 'cloudinary://228944556196295:4-he4Nls7J274KDH1AgDZ-ujt2M@duoovd5y9'),
-        'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME', 'duoovd5y9'),
-        'API_KEY': os.getenv('CLOUDINARY_API_KEY', '228944556196295'),
-        'API_SECRET': os.getenv('CLOUDINARY_API_SECRET', '4-he4Nls7J274KDH1AgDZ-ujt2M'),
-        'MEDIA_TAG': 'media',
-        'SECURE': True,
-    }
-
-# Media configuration
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-# Ensure the media directory exists in development
-os.makedirs(MEDIA_ROOT, exist_ok=True)

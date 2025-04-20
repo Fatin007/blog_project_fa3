@@ -11,13 +11,12 @@
                 <div class="card-body p-4">
                     <div class="text-center mb-4">
                         <div class="profile-picture-preview mb-3">
-                            {% if user.profile.profile_picture %}
-                                <img src="{{ user.profile.profile_picture.url }}" alt="Current Profile Picture" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;">
-                            {% else %}
-                                <div class="default-profile-picture">
-                                    <i class="fas fa-user-circle fa-5x text-primary"></i>
-                                </div>
+                            {% if user.profile.profile_picture and user.profile.profile_picture.url %}
+                                <img src="{{ user.profile.profile_picture.url }}" alt="Current Profile Picture" class="rounded-circle" style="width: 120px; height: 120px; object-fit: cover;" onerror="this.onerror=null;this.style.display='none';document.querySelector('.default-profile-picture').style.display='flex';">
                             {% endif %}
+                            <div class="default-profile-picture" style="display: {% if user.profile.profile_picture and user.profile.profile_picture.url %}none{% else %}flex{% endif %};">
+                                <i class="fas fa-user-circle fa-5x text-primary"></i>
+                            </div>
                         </div>
                         <a href="{% url "change_password" %}" class="btn btn-outline-warning">
                             <i class="fas fa-key me-1"></i> Change Password

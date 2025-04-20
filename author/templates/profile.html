@@ -8,7 +8,7 @@
                 <div class="card-body text-center p-4">
                     <div class="profile-header mb-4">
                         <div class="profile-avatar mb-3">
-                            {% if user.profile.profile_picture %}
+                            {% if user.profile.profile_picture and user.profile.profile_picture.url %}
                                 <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" class="rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
                             {% else %}
                                 <i class="fas fa-user-circle fa-4x text-primary"></i>

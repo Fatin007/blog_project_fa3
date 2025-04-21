@@ -9,7 +9,10 @@ import requests
 def get_random_hero_image():
     categories = Category.objects.all()
     category_names = [cat.name for cat in categories]
+    category_names = [name.replace(" ", "_") for name in category_names]
     query = ",".join(category_names)
+    # print("Fetching image for categories:", query)
+
     try:
         response = requests.get(
             "https://api.unsplash.com/photos/random",

@@ -14,9 +14,19 @@ from pathlib import Path
 import os
 import dj_database_url 
 from dotenv import load_dotenv
-import cloudinary_storage
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
 
 load_dotenv()
+
+# Configure Cloudinary
+cloudinary.config(
+    cloud_name=os.getenv('CLOUDINARY_CLOUD_NAME'),
+    api_key=os.getenv('CLOUDINARY_API_KEY'),
+    api_secret=os.getenv('CLOUDINARY_API_SECRET'),
+    secure=True
+)
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -70,13 +80,18 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env_config['debug']
 
-# ALLOWED_HOSTS = ['*']  # Configure this appropriately in production
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    'fa3-blog.onrender.com',
-    'www.fa3-blog.onrender.com',
-]
+if ENVIRONMENT.lower() == 'production':
+    ALLOWED_HOSTS = [
+        'fa3-blog.onrender.com',
+        'www.fa3-blog.onrender.com',
+    ]
+    # Add CSRF trusted origins for production
+    CSRF_TRUSTED_ORIGINS = [
+        'https://fa3-blog.onrender.com',
+        'https://www.fa3-blog.onrender.com',
+    ]
+else:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Application definition
 
@@ -104,6 +119,7 @@ CRISPY_TEMPLATE_PACK = "bootstrap5"
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -200,11 +216,16 @@ CKEDITOR_5_CONFIGS = {
 }
 
 # Path for CKEditor 5 uploads
-# CKEDITOR_5_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage' if not DEBUG else 'django.core.files.storage.FileSystemStorage'
-CKEDITOR_5_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+if ENVIRONMENT.lower() == 'production':
+    CKEDITOR_5_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+    MEDIA_URL = '/media/'
+else:
+    CKEDITOR_5_FILE_STORAGE = 'django.core.files.storage.FileSystemStorage'
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 CKEDITOR_5_UPLOAD_PATH = 'uploads/ckeditor/'
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 WSGI_APPLICATION = 'blog_project.wsgi.application'
 
@@ -213,48 +234,21 @@ WSGI_APPLICATION = 'blog_project.wsgi.application'
 
 # Use dj-database-url to handle database configurations
 # This will look for DATABASE_URL in environment variables
-# database_url = os.environ.get('DATABASE_URL')
+database_url = os.environ.get('DATABASE_URL')
 
-# if database_url:
-#     DATABASES = {
-#         'default': dj_database_url.config(default=database_url, conn_max_age=600)
-#     }
-# elif ENVIRONMENT.lower() == 'production':
-#     # Production: Railway internal PostgreSQL connection
-#     db_pass = os.environ.get('DB_PASS')
-#     if db_pass:
-#         DATABASES = {
-#             'default': {
-#                 'ENGINE': 'django.db.backends.postgresql',
-#                 'NAME': 'railway',
-#                 'USER': 'postgres',
-#                 'PASSWORD': db_pass,
-#                 'HOST': 'maglev.proxy.rlwy.net',
-#                 'PORT': '17987',
-#             }
-#         }
-#     else:
-#         # Fallback to SQLite if DB_PASS is not available
-#         DATABASES = {
-#             'default': {
-#                 'ENGINE': 'django.db.backends.sqlite3',
-#                 'NAME': BASE_DIR / 'db.sqlite3',
-#             }
-#         }
-# else:
-#     DATABASES = {
-#         'default': {
-#             'ENGINE': 'django.db.backends.sqlite3',
-#             'NAME': BASE_DIR / 'db.sqlite3',
-#         }
-#     }
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if database_url:
+    # Use DATABASE_URL if provided (Render, Railway, etc.)
+    DATABASES = {
+        'default': dj_database_url.config(default=database_url, conn_max_age=600)
     }
-}
+else:
+    # Fallback to SQLite for local development
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -295,6 +289,8 @@ STATICFILES_DIRS = [
 ]
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

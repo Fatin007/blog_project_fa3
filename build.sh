@@ -5,6 +5,9 @@ set -o errexit
 # Install Python dependencies
 pip install -r requirements.txt
 
+python manage.py collectstatic --noinput
+python manage.py migrate
+
 # Create media directory if it doesn't exist and set permissions
 mkdir -p media
 chmod 755 media

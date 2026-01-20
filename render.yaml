@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: blog-project
+    name: livewire-blog
     env: python
     buildCommand: "./build.sh"
     startCommand: "gunicorn blog_project.wsgi:application"

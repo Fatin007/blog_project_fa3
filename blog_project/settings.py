@@ -82,11 +82,19 @@ DEBUG = env_config['debug']
 
 if ENVIRONMENT.lower() == 'production':
     ALLOWED_HOSTS = [
+        'livewire-blog.onrender.com',
+        'www.livewire-blog.onrender.com',
+        'fa3-blog.herokuapp.com',
+        'www.fa3-blog.herokuapp.com',
         'fa3-blog.onrender.com',
         'www.fa3-blog.onrender.com',
     ]
     # Add CSRF trusted origins for production
     CSRF_TRUSTED_ORIGINS = [
+        'https://livewire-blog.onrender.com',
+        'https://www.livewire-blog.onrender.com',
+        'https://fa3-blog.herokuapp.com',
+        'https://www.fa3-blog.herokuapp.com',
         'https://fa3-blog.onrender.com',
         'https://www.fa3-blog.onrender.com',
     ]

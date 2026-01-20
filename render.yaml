@@ -13,13 +13,5 @@ services:
         value: False
       - key: DJANGO_ENVIRONMENT
         value: production
-      - key: CLOUDINARY_CLOUD_NAME
-        value: duoovd5y9
-      - key: CLOUDINARY_API_KEY
-        value: 228944556196295
-      - key: CLOUDINARY_API_SECRET
-        value: 4-he4Nls7J274KDH1AgDZ-ujt2M
-      - key: CLOUDINARY_URL
-        value: cloudinary://228944556196295:4-he4Nls7J274KDH1AgDZ-ujt2M@duoovd5y9
       # DATABASE_URL removed - using SQLite for now
       # To use PostgreSQL later, create database manually in Render dashboard

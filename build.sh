@@ -2,6 +2,9 @@
 # exit on error
 set -o errexit
 
+# Upgrade pip to latest version
+pip install --upgrade pip
+
 # Install Python dependencies
 pip install -r requirements.txt
 
